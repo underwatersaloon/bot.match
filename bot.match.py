@@ -8,7 +8,7 @@ cmds = ['boat' , 'boom' , 'board' , 'leave' , 'recruit' , 'find']
 #crew list
 cList = []
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1JncA.NnjI9si1p8DgYINFXaRHTEShadY'
+Token = '유사토큰'
 
 def cmdParse(cmd):
     """cmd Parser 써보지 않아서 모름"""
@@ -79,7 +79,7 @@ async def on_message(message):
         elif cmd[0] == cmds[3]:
             print('leave')
             if cList.count(msgId):
-                if ship.sList.findbycap(msgId) > 0 :
+                if ship.findbycap(msgId) > 0 :
                     await client.send_message(message.channel, 'you can\'t leave your boat')
                 else :
                     cIndex = ship.findbyId(msgId)
