@@ -64,7 +64,18 @@ async def on_message(message):
             if cList.count(msgId):
                 await client.send_message(message.channel, 'he\'s already on crewlist')
             else:
-                pass #뽀트 인덱스를 이용해서 승선시킨다
+                if cmd[1].startswith('#') && cmd[1][1:].isnumeric() :
+                    cIndex = int(mcd[1])
+                    if ship.callbyindex(cIndex) is not None :
+                        if ship.callbyindex(cIndex).boarding(msgId) :
+                            cList.attend(msgId)
+                            await client.send_message(message.channel, 'you just boarded')
+                        else :
+                            await client.send_message(message.channel, 'you failed to get on the boat')
+                    else :
+                        await client.send_message(message.channel, 'there\'s no such boat')
+                else :
+                    await client.send_message(message.channel, 'wrong number')
         elif cmd[0] == cmds[3]:
             print('leave')
             if cList.count(msgId):
