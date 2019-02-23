@@ -14,7 +14,7 @@ def cmdParse(cmd):
     """cmd Parser 써보지 않아서 모름"""
     return cmd[1:].split(' ',1)
 
-def argParse(argu,sep)
+def argParse(argu,sep):
     """과연 쓸일이 있을까?"""
     pass
 
@@ -64,8 +64,8 @@ async def on_message(message):
             if cList.count(msgId):
                 await client.send_message(message.channel, 'he\'s already on crewlist')
             else:
-                if cmd[1].startswith('#') && cmd[1][1:].isnumeric() :
-                    cIndex = int(mcd[1])
+                if cmd[1].startswith('#') & cmd[1][1:].isnumeric() :
+                    cIndex = int(mcd[1][1:])
                     if ship.callbyindex(cIndex) is not None :
                         if ship.callbyindex(cIndex).boarding(msgId) :
                             cList.attend(msgId)
