@@ -8,7 +8,7 @@ cmds = ['boat' , 'boom' , 'board' , 'leave' , 'recruit' , 'find']
 #crew list
 cList = []
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1JncA.NnjI9si1p8DgYINFXaRHTEShadY'
+Token = ''
 
 def cmdParse(cmd):
     """cmd Parser 써보지 않아서 모름"""
