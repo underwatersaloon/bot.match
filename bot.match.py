@@ -8,7 +8,7 @@ cmds = ['boat' , 'boom' , 'board' , 'leave' , 'recruit' , 'find']
 #crew list
 cList = []
 
-Token = ''
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1JncA.NnjI9si1p8DgYINFXaRHTEShadY'
 
 def cmdParse(cmd):
     """cmd Parser 써보지 않아서 모름"""
@@ -92,8 +92,10 @@ async def on_message(message):
         elif cmd[0] == cmds[4]:
             print('recruit')
             if len(ship.sList) > 0 :
+                embed=discord.Embed(title="boat list", description="where's your boat")
                 for i in ship.sList :
-                    await client.send_message(message.channel, i.subject + '(captain ' + i.captain + ')')
-
+                    bInfo=i.infor()
+                    embed.add_field(name = bInfo[0], value = bInfo[1], inline=True)
+                await client.send_message(message.channel,embed=embed)
                     
 client.run(Token)

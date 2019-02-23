@@ -6,7 +6,6 @@ class ship:
     _gIndex = 0
     sList=[]
 
-
     def __init__(self, member):
         if ship.sList.count(member.id):
             return
@@ -80,3 +79,9 @@ class ship:
             return True
         else :
             return False     
+    
+    def infor(self):
+        tmp = []
+        tmp.append('#{} - {}'.format(self.index,self.subject))
+        tmp.append('{} / {} ({})'.format(len(self.crews)+1,self.maxc,self.reqc))
+        return tmp
