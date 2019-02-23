@@ -35,7 +35,7 @@ async def on_message(message):
         
         if cmd[0] == cmds[0]:
             print('boat : ' + msgId)
-            if ship.sList.count(msgId):
+            if ship.cList.count(msgId):
                 await client.send_message(message.channel, 'he\'s already on his boat')
             else:
                 ship(message.author)
@@ -44,7 +44,7 @@ async def on_message(message):
                     await client.send_message(message.channel, 'your boat is ready')
                 else :
                     await client.send_message(message.channel, 'has a problem')
-                print("succeed")
+                print("succeed")    
         elif cmd[0] == cmds[1]:
             print('boom')
             cIndex = ship.findbycap(msgId)
@@ -79,10 +79,10 @@ async def on_message(message):
         elif cmd[0] == cmds[3]:
             print('leave')
             if cList.count(msgId):
-                if ship.sList.findbycap(msgId) > 0 :
+                if ship.findbycap(msgId) > 0 :
                     await client.send_message(message.channel, 'you can\'t leave your boat')
                 else :
-                    cIndex = ship.findbyId(msgId)
+                    cIndex = ship.findbyid(msgId)
                     if cIndex > 0:
                         ship.callbyindex(cIndex).leaving(msgId)
                     cList.remove(msgId)
