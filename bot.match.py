@@ -82,7 +82,7 @@ async def on_message(message):
                 if ship.findbycap(msgId) > 0 :
                     await client.send_message(message.channel, 'you can\'t leave your boat')
                 else :
-                    cIndex = ship.findbyId(msgId)
+                    cIndex = ship.findbyd(msgId)
                     if cIndex > 0:
                         ship.callbyindex(cIndex).leaving(msgId)
                     cList.remove(msgId)
