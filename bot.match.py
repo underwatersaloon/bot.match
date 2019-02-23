@@ -64,7 +64,7 @@ async def on_message(message):
             if cList.count(msgId):
                 await client.send_message(message.channel, 'he\'s already on crewlist')
             else:
-                if cmd[1].startswith('#') && cmd[1][1:].isnumeric() :
+                if cmd[1].startswith('#') & cmd[1][1:].isnumeric() :
                     cIndex = int(mcd[1])
                     if ship.callbyindex(cIndex) is not None :
                         if ship.callbyindex(cIndex).boarding(msgId) :
