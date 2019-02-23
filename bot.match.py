@@ -13,7 +13,7 @@ cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중']
 #crew list
 cList = []
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1JncA.NnjI9si1p8DgYINFXaRHTEShadY'
+Token = ''
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
