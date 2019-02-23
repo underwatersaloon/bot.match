@@ -65,10 +65,10 @@ async def on_message(message):
                 await client.send_message(message.channel, 'he\'s already on crewlist')
             else:
                 if cmd[1].startswith('#') & cmd[1][1:].isnumeric() :
-                    cIndex = int(mcd[1][1:])
+                    cIndex = int(cmd[1][1:])
                     if ship.callbyindex(cIndex) is not None :
                         if ship.callbyindex(cIndex).boarding(msgId) :
-                            cList.attend(msgId)
+                            cList.append(msgId)
                             await client.send_message(message.channel, 'you just boarded')
                         else :
                             await client.send_message(message.channel, 'you failed to get on the boat')

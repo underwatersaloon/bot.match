@@ -46,8 +46,8 @@ class ship:
         for i in ship.sList :
             if i.captain == memId :
                 return i.index
-            elif tmp == i.findbycrew(memId) :
-                return tmp
+            elif i.findbycrew(memId) > 0 :
+                return i.index
         return -1
 
     @classmethod
