@@ -14,7 +14,7 @@ def cmdParse(cmd):
     """cmd Parser 써보지 않아서 모름"""
     return cmd[1:].split(' ',1)
 
-def argParse(argu,sep)
+def argParse(argu,sep):
     """과연 쓸일이 있을까?"""
     pass
 
