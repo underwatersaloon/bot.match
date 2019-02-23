@@ -2,7 +2,7 @@ import discord
 
 class ship:
     
-    __slots__ = ['index', 'captain', 'crews', 'subject', 'ftime', 'waiting', 'reqc', 'maxc', 'state']
+    __slots__ = ['index', 'captain', 'crews', 'subject', 'ftime', 'waiting', 'reqc', 'maxc', 'state', 'dest']
     _gIndex = 0
     sList=[]
 
