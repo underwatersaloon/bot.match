@@ -22,20 +22,7 @@ class ship:
         self.state = 0
         ship.sList.append(self)
         return
-
-#    def __init__(self, nId, name):
-#        if ship.sList.count(nId):
-#            return
-#        self.index = ship._gIndex
-#        ship._gIndex += 1
-#        self.captain = nId
-#        self.crews = []
-#        self.subject = name + '\'s boat'
-#        self.reqc = 3
-#        self.maxc = 5
-#        self.state = 0
-#        ship.sList.append(self)
-
+    
     def __eq__(self, other):
         if self.captain == other :
             return True
