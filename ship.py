@@ -7,7 +7,7 @@ class ship:
     sList=[]
     _slotKor = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '필요 인원', '최대 인원', '상태', '목적지']
     _attTrans = dict(zip(_slotKor,__slots__))
-    _attSet = dict(zip(__slots__,[None, None, None, 'str', None, 'num', 'num', 'num','num', 'str']))
+    _attSet = dict(zip(__slots__,[None, None, None, 'str', None, 'num', 'num', 'num', None, 'str']))
 
     def __init__(self, member):
         if ship.sList.count(member.id):
@@ -96,7 +96,23 @@ class ship:
         tmp = ship._attTrans[name]
         if ship._attSet[tmp] == 'num' :
             if str(value).isnumeric :
-                return super().__setattr__(tmp, value)
+                if tmp == 'waiting' :
+                    if 1440 > int(value) & int(value) >0 :
+                        return super().__setattr__(tmp, value)
+                    else :
+                        return None
+                if tmp == 'reqc' :
+                    if self.maxc < int(value) & int(value) > 0:
+                        return super().__setattr__(tmp, value)
+                    else :
+                        return None
+                if tmp == 'maxc' :
+                    if int (value) < 16 & int(value) > self.reqc & int(value) > len(self.crews) :
+                        return super().__setattr__(tmp, value)
+                    else :
+                        return None
+                else :
+                    return super().__setattr__(tmp, value)
         elif ship._attSet[tmp] == 'str':
             return super().__setattr__(tmp, value)
         return None
