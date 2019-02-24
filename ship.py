@@ -74,13 +74,13 @@ class ship:
             return tmp.crews
 
     def boarding(self, crewId):
-        if len(self.crews) == (self.maxc - 1) | self.crews.count(crewId) :
+        if len(self.crews) == (self.maxc - 1) or self.crews.count(crewId) :
             return False
         self.crews.append(crewId)
         return True
         
     def leaving(self, crewId):
-        if self.crews.count(crewId) | len(self.crews) != 0 :
+        if self.crews.count(crewId) or len(self.crews) != 0 :
             self.crews.remove(crewId)
             return True
         else :
@@ -95,20 +95,21 @@ class ship:
     def set(self, name, value):
         tmp = ship._attTrans[name]
         if ship._attSet[tmp] == 'num' :
-            if str(value).isnumeric() & int(value) >=0 :
+            if str(value).isnumeric() and int(value) >=0 :
+                num = int(value)
                 if tmp == 'waiting' :
-                    if 1440 >= int(value):
-                        return super().__setattr__(tmp, value)
+                    if 1440 >= num:
+                        return super().__setattr__(tmp, num)
                     else :
                         return None
                 elif tmp == 'reqc' :
-                    if self.maxc >= int(value) :
-                        return super().__setattr__(tmp, value)
+                    if self.maxc >= num :
+                        return super().__setattr__(tmp, num)
                     else :
                         return None
                 elif tmp == 'maxc' :
-                    if 16 >= int (value) & (int(value) >= self.reqc & int(value) >= len(self.crews)) :
-                        return super().__setattr__(tmp, value)
+                    if 16 >= num and num >= self.reqc and num >= len(self.crews) +1 :
+                        return super().__setattr__(tmp, num)
                     else :
                         return None
                 else :
@@ -120,7 +121,7 @@ class ship:
     def has(self, name):
         if name in ship._attTrans :
             tmp = ship._attTrans[name]
-            print("{} : {}".format(name, tmp))
+            #print("{} : {}".format(name, tmp))
             return hasattr(self,tmp)
         else :
             return False

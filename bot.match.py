@@ -15,7 +15,7 @@ cList = []
 wcList = []
 
 
-Token = ''
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1Nq5g.q6S0PINZLuz0h0vjDTTQAr-xCvo'
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -92,7 +92,7 @@ async def board(message, cmd):
     if cList.count(msgId):
         await client.send_message(message.channel, 'he\'s already on crewlist')
     else:
-        if cmd[1].startswith('#') & cmd[1][1:].isnumeric() :
+        if cmd[1].startswith('#') and cmd[1][1:].isnumeric() :
             cIndex = int(cmd[1][1:])
             if ship.callbyindex(cIndex) is not None :
                 if ship.callbyindex(cIndex).boarding(msgId) :
@@ -162,7 +162,7 @@ async def setBoat(message, cmd):
         if len(argv.items()) > 0 :
             boat = ship.callbyindex(cIndex)
             for k,v in argv.items() :
-                print('{} : {}'.format(k,v))
+                #print('{} : {}'.format(k,v))
                 if boat.has(str(k)) :
                     boat.set(str(k),v)
                     pass
