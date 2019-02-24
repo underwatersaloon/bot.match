@@ -15,15 +15,16 @@ cList = []
 wcList = []
 
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1Nq5g.q6S0PINZLuz0h0vjDTTQAr-xCvo'
+Token = ''
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
     return cmd[start:].split(' ')
 
-def argParse(argu,sep):
-    """과연 쓸일이 있을까?"""
-    pass
+def argParse(argu,sep1,sep2=' '):
+    """ : 로 구분? !중망호 세팅 이름:블라블라 블라숑, 블라블라 속성:하 시발 담배가 맵다, 아니시발 존나 싫엏 ㅠㅠ: 머라머라 머라, """
+    argv = argu.split(",")
+    return argv
 
 async def boat(message, cmd):
     msgId=message.author.id
@@ -114,7 +115,7 @@ async def boatInform(message, cmd):
     if cIndex >= 0 :
         msgS = message.server
         tmpS = ship.callbyindex(cIndex)
-        await client.send_message(message.channel, "#{}-{} : {} 선장(처녀, 임신가능) ({}/{}-{})".format(cIndex, tmpS.subject, msgS. get_user_info(tmpS.captain),len(tmpS.crews),tmpS.reqc, tmpS.maxc))
+        await client.send_message(message.channel, "#{}-{} : {} 선장(처녀, 임신가능) ({}/{}-{})".format(cIndex, tmpS.subject, msgS. get_member(tmpS.captain).name,len(tmpS.crews) +1,tmpS.reqc, tmpS.maxc))
         pass
     else :
         await client.send_message(message.channel, "당신의 배는 없는 거샤아악")
@@ -142,7 +143,8 @@ async def setBoat(message, cmd):
     cIndex = -1
     #has attr, get attr, set attr을 사용해서 적절하게 짠다.
     pass
-        
+
+
 @client.event
 async def on_ready():
     print('logged in as')
