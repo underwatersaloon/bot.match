@@ -1,11 +1,13 @@
 import discord
 
 class ship:
-    
-#    __attrskr__ = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '필요 인원', '최대 인원', '상태', '목적지']
+
     __slots__ = ['index', 'captain', 'crews', 'subject', 'ftime', 'waiting', 'reqc', 'maxc', 'state', 'dest']
     _gIndex = 0
     sList=[]
+    _slotKor = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '필요 인원', '최대 인원', '상태', '목적지']
+    _attTrans = dict(zip(_slotKor,__slots__))
+    _attSet = dict(zip(__slots__,[None, None, None, 'str', None, 'num', 'num', 'num','num', 'str']))
 
     def __init__(self, member):
         if ship.sList.count(member.id):
@@ -89,3 +91,20 @@ class ship:
         tmp.append('#{} - {}'.format(self.index,self.subject))
         tmp.append('{} / {} ({})'.format(len(self.crews)+1,self.maxc,self.reqc))
         return tmp
+
+    def set(self, name, value):
+        tmp = ship._attTrans[name]
+        if ship._attSet[tmp] == 'num' :
+            if str(value).isnumeric :
+                return super().__setattr__(tmp, value)
+        elif ship._attSet[tmp] == 'str':
+            return super().__setattr__(tmp, value)
+        return None
+
+    def has(self, name):
+        if name in ship._attTrans :
+            tmp = ship._attTrans[name]
+            print("{} : {}".format(name, tmp))
+            return hasattr(self,tmp)
+        else :
+            return False

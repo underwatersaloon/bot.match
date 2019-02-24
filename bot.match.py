@@ -163,10 +163,10 @@ async def setBoat(message, cmd):
             boat = ship.callbyindex(cIndex)
             for k,v in argv.items() :
                 print('{} : {}'.format(k,v))
-                if hasattr(boat,str(k)) :
-                    setattr(boat,str(k),v)
+                if boat.has(str(k)) :
+                    boat.set(str(k),v)
                     pass
-            await client.send_message(message.channel,'변경 완료')
+            #await client.send_message(message.channel,'변경 완료')
         else :
             print('no args')
         pass
@@ -203,8 +203,8 @@ async def on_message(message):
         elif cmd[0] == cmds[6] :
             await callMem(message,cmd)
         elif cmd[0] == cmds[7] :
-            #await setBoat(message,cmd)
-            await client.send_message(message.channel, "아직 구현 덜됨")
+            await setBoat(message,cmd)
+            #await client.send_message(message.channel, "아직 구현 덜됨")
     return
 
 client.run(Token)

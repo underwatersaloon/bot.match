@@ -73,4 +73,9 @@ class ship:
             self.crews.remove(crewId)
             return True
         else :
-            return False     
+            return False
+
+    def __setattr__(self, name, value):
+        print('{} : {}'.format(name , value))
+        return super().__setattr__(name, value)
+    
