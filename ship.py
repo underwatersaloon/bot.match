@@ -95,19 +95,19 @@ class ship:
     def set(self, name, value):
         tmp = ship._attTrans[name]
         if ship._attSet[tmp] == 'num' :
-            if str(value).isnumeric :
+            if str(value).isnumeric() & int(value) >=0 :
                 if tmp == 'waiting' :
-                    if 1440 > int(value) & int(value) >0 :
+                    if 1440 >= int(value):
                         return super().__setattr__(tmp, value)
                     else :
                         return None
-                if tmp == 'reqc' :
-                    if self.maxc < int(value) & int(value) > 0:
+                elif tmp == 'reqc' :
+                    if self.maxc >= int(value) :
                         return super().__setattr__(tmp, value)
                     else :
                         return None
-                if tmp == 'maxc' :
-                    if int (value) < 16 & int(value) > self.reqc & int(value) > len(self.crews) :
+                elif tmp == 'maxc' :
+                    if 16 >= int (value) & (int(value) >= self.reqc & int(value) >= len(self.crews)) :
                         return super().__setattr__(tmp, value)
                     else :
                         return None

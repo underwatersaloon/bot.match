@@ -15,7 +15,7 @@ cList = []
 wcList = []
 
 
-Token = ''
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1Nq5g.q6S0PINZLuz0h0vjDTTQAr-xCvo'
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
