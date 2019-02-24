@@ -2,6 +2,7 @@ import discord
 
 class ship:
     
+    __attrskr__ = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '필요 인원', '최대 인원', '상태', '목적지']
     __slots__ = ['index', 'captain', 'crews', 'subject', 'ftime', 'waiting', 'reqc', 'maxc', 'state', 'dest']
     _gIndex = 0
     sList=[]
@@ -30,23 +31,26 @@ class ship:
 
     @classmethod
     def findbycap(self, capId):
+        "return cls.index 선장의 Id로 배를 찾는다."
         for i in ship.sList :
             if i.captain == capId :
                 return i.index
         return -1
 
     def findbycrew(self, crewId):
+        """내부용 메소드. 외부에서 부르면 안된다."""
         for i in self.crews :
             if i == crewId :
-                return self.index
-        return -1
+                return True
+        return False
 
     @classmethod
     def findbyid(self, memId):
+        "return cls.index 멤버의 Id로 배를 찾는다"
         for i in ship.sList :
             if i.captain == memId :
                 return i.index
-            elif i.findbycrew(memId) > 0 :
+            elif i.findbycrew(memId) :
                 return i.index
         return -1
 

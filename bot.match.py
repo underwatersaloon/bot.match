@@ -8,12 +8,14 @@ client = discord.Client();
 #control character
 ctrlch='!중망호 '
 #command list
-cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중']
+cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출']
 #cmds.extend = ['설정', '출항', '선원 등록', '명령어', '관리자']
 #crew list
 cList = []
+wcList = []
 
-Token = ''
+
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1Nq5g.q6S0PINZLuz0h0vjDTTQAr-xCvo'
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -23,7 +25,9 @@ def argParse(argu,sep):
     """과연 쓸일이 있을까?"""
     pass
 
-async def boat(message, cmd, msgId):
+async def boat(message, cmd):
+    msgId=message.author.id
+    cIndex = -1
     print('boat : ' + msgId) 
     if cList.count(msgId):
         await client.send_message(message.channel, 'he\'s already on his boat')
@@ -38,7 +42,9 @@ async def boat(message, cmd, msgId):
             await client.send_message(message.channel, 'has a problem')
                 #print("succeed")
 
-async def boom(message, cmd, msgId):
+async def boom(message, cmd):
+    msgId=message.author.id
+    cIndex = -1
     print('boom')
     cIndex = ship.findbycap(msgId)
     if cIndex < 0 :
@@ -52,7 +58,9 @@ async def boom(message, cmd, msgId):
         cList.remove(msgId)
         await client.send_message(message.channel, 'boomed!')
 
-async def leave(message, cmd, msgId):
+async def leave(message, cmd):
+    msgId=message.author.id
+    cIndex = -1
     print('leave')
     if cList.count(msgId):
         if ship.findbycap(msgId) == -1 :
@@ -66,7 +74,9 @@ async def leave(message, cmd, msgId):
     else:
         await client.send_message(message.channel, 'you\'re not unemployeed')
 
-async def board(message, cmd, msgId):
+async def board(message, cmd):
+    msgId=message.author.id
+    cIndex = -1
     print('board')
     if cList.count(msgId):
         await client.send_message(message.channel, 'he\'s already on crewlist')
@@ -84,7 +94,9 @@ async def board(message, cmd, msgId):
         else :
             await client.send_message(message.channel, 'wrong boat number')
 
-async def recruit(message, cmd, msgId):
+async def recruit(message, cmd):
+    msgId=message.author.id
+    cIndex = -1
     print('recruit')
     if len(ship.sList) > 0 :
         embed=discord.Embed(title="제 1부두",description="뽀트는 중붕이를 태우고-")
@@ -92,7 +104,44 @@ async def recruit(message, cmd, msgId):
             bInfo=i.infor()
             embed.add_field(name = bInfo[0], value = bInfo[1], inline=True)
         await client.send_message(message.channel,embed=embed)
-    return None
+    pass
+
+async def boatInform(message, cmd):
+    msgId=message.author.id
+    cIndex = -1
+    print("check Information : {} - {}".format(message.author.name, msgId))
+    cIndex = ship.findbyid(msgId)
+    if cIndex >= 0 :
+        msgS = message.server
+        tmpS = ship.callbyindex(cIndex)
+        await client.send_message(message.channel, "#{}-{} : {} 선장(처녀, 임신가능) ({}/{}-{})".format(cIndex, tmpS.subject, msgS. get_user_info(tmpS.captain),len(tmpS.crews),tmpS.reqc, tmpS.maxc))
+        pass
+    else :
+        await client.send_message(message.channel, "당신의 배는 없는 거샤아악")
+        pass
+    pass
+
+async def callMem(message, cmd):
+    msgId = message.author.id
+    cIndex = -1
+    cIndex = ship.findbycap(msgId)
+    if cIndex > -1 :
+        boat = ship.callbyindex(cIndex)
+        #await client.send_message(message.server.get_member(boat.captain),"너는 선장인테치 선원을 부를수 있는테치") 테스트용 선장 호출메시지
+        for c in ship.crews:
+            await client.send_message(message.server.get_member(c),'중망호({})의 선장이 선원들을 호출했다.'.format(boat.subject))
+            pass
+        pass
+    else :
+        await client.send_message(message.channel,"너는 선장이 아닌테치!")
+        pass
+    pass
+
+async def setBoat(message, cmd):
+    msgId = message.author.id
+    cIndex = -1
+    #has attr, get attr, set attr을 사용해서 적절하게 짠다.
+    pass
         
 @client.event
 async def on_ready():
@@ -105,21 +154,24 @@ async def on_ready():
 async def on_message(message):
     if message.content.startswith(ctrlch):
         cmd = cmdParse(message.content, len(ctrlch)) #파싱 파-킹 이 아니라
-        msgId=message.author.id #길어
-        cIndex = -1 #index cursor
+        #msgId=message.author.id #길어 함수 내부로 이동
+        #cIndex = -1 #index cursor 함수 내부로 이동
         print('ent_msgProc : {}'.format(cmd[0])) #프로시저 진입 메시지 디버깅용
 
         if cmd[0] == cmds[0]:
-            await boat(message,cmd,msgId)
+            await boat(message,cmd)
         elif cmd[0] == cmds[1] :
-            await boom(message,cmd,msgId)
+            await boom(message,cmd)
         elif cmd[0] == cmds[2] :
-            await board(message,cmd,msgId)
+            await board(message,cmd)
         elif cmd[0] == cmds[3] :
-            await leave(message,cmd,msgId)
-        elif cmd[0] == cmds[4]:
-            await recruit(message,cmd,msgId)
-    
+            await leave(message,cmd)
+        elif cmd[0] == cmds[4] :
+            await recruit(message,cmd)
+        elif cmd[0] == cmds[5] :
+            await boatInform(message,cmd)
+        elif cmd[0] == cmds[6] :
+            await callMem(message,cmd)
     return
 
 client.run(Token)
