@@ -8,14 +8,23 @@ client = discord.Client();
 #control character
 ctrlch='!중망호 '
 #command list
-cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정']
-#cmds.extend = ['설정', '출항', '선원 등록', '명령어', '관리자']
+help = '도움!' 
+cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정' , '출항']
+guides = [ '만들기 [배 이름] : 새로운 배를 만든다. 배를 만든 사람은 선장이 된다. \n 배 이름을 입력하면 이름을 가진 배를 만들수 있다.' # 만들기 명령어에 대한 도움말
+          ,'수장 : (선장 전용) 배를 버린다.' # 수장 명령어에 대한 도움말
+          ,'타기 #(배 번호) : 배에 탄다. 이미 배를 가지고 있거나, 배에 탔다면 탈수 없다.' # 타기 명령어
+          ,'내리기 : 배에서 내린다. 선장은 배에서 내릴 수 없다. 플라잉 더치맨에겐 선장이 필요하다.' # 내리기
+          ,'모집중 : 현재 선원을 모집하는 배를 확인한다.' # 모집중
+          ,'정보 : 현재 타고 있는 배를 확인한다.' # 정보
+          ,'호출 : (선장 전용) 선장은 선원을 호출할 수 있다. 바다로 나갈 시간이다!' # 호출
+          ,'설정 (항목) : (변경 내용) , ... : (선장 전용) 선장은 자신의 배를 변경할 수 있다. \n 변경 가능 항목은 "배 이름" , "필요 인원" , "최대 인원", "출발 시간" 이다. '] # 설정
+#cmds.extend = ['출항', '선원 등록', '명령어', '관리자']
 #crew list
 cList = []
 wcList = []
 
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1Nq5g.q6S0PINZLuz0h0vjDTTQAr-xCvo'
+Token = ''
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -94,10 +103,14 @@ async def board(message, cmd):
     else:
         if cmd[1].startswith('#') and cmd[1][1:].isnumeric() :
             cIndex = int(cmd[1][1:])
-            if ship.callbyindex(cIndex) is not None :
-                if ship.callbyindex(cIndex).boarding(msgId) :
+            tmpB = ship.callbyindex(cIndex)
+            if tmpB is not None :
+                if tmpB.boarding(msgId) :
                     cList.append(msgId)
                     await client.send_message(message.channel, 'you just boarded')
+                    if tmpB.maxc == len(tmpB.crews) + 1 :
+                        await client.send_message(message.server.get_member(tmpB.captain),'당신의 선원이 다 모였습니다. 출항 대기중')
+                        pass
                 else :
                     await client.send_message(message.channel, 'you failed to get on the boat')
             else :
@@ -113,7 +126,8 @@ async def recruit(message, cmd):
         embed=discord.Embed(title="제 1부두",description="뽀트는 중붕이를 태우고-")
         for i in ship.sList :
             bInfo=i.infor()
-            embed.add_field(name = bInfo[0], value = bInfo[1], inline=True)
+            if i.state == 0 :
+               embed.add_field(name = bInfo[0], value = bInfo[1], inline=True)
         await client.send_message(message.channel,embed=embed)
     pass
 
@@ -163,8 +177,8 @@ async def setBoat(message, cmd):
             boat = ship.callbyindex(cIndex)
             for k,v in argv.items() :
                 #print('{} : {}'.format(k,v))
-                if boat.has(str(k)) :
-                    boat.set(str(k),v)
+                if boat.has(str(k)) : #has 메서드는 hasattr의 클래스 래핑 함수다.
+                    boat.set(str(k),v) #set 메서드도 그렇다
                     pass
             #await client.send_message(message.channel,'변경 완료')
         else :
@@ -172,6 +186,30 @@ async def setBoat(message, cmd):
         pass
     pass
 
+async def depart(message, cmd) :
+    msgId=message.author.id
+    cIndex = ship.findbycap(msgId)
+    if cIndex != -1 :
+        tmpS = ship.callbyindex(cIndex)
+        if tmpS.state == 1 :
+            await client.send_message(message.channel,"이미 바다에 나가버린 배입니다.")
+        elif (len(tmpS.crews) + 1) >= tmpS.reqc :
+            tmpS.state = 1 #수정 필요
+            await client.send_message(message.channel,"요오시 출항이다!")
+        else :
+            await client.send_message(message.channel,"바다는 위험하단다. 어서 선원들을 더 모아오렴 (필요 노예 수:{})".format(tmpS.reqc - len(tmpS.crews) -1))
+    else :
+        await client.send_message(message.channel,"유령선은 출발하지 않는다.")
+    pass
+
+async def helpMsg(message, cmd):
+    msgId = message.author.id
+    embed = discord.Embed(title = '도움!', description = "모든 명령어는 '{}' 으로 시작한다.".format(ctrlch) )
+    hDict = dict(zip(cmds,guides))
+
+    for k , v in hDict.items():
+        embed.add_field(name = k, value = v , inline = False)
+    await client.send_message(message.server.get_member(msgId),embed= embed)
 
 @client.event
 async def on_ready():
@@ -187,6 +225,8 @@ async def on_message(message):
         #msgId=message.author.id #길어 함수 내부로 이동
         #cIndex = -1 #index cursor 함수 내부로 이동
         print('ent_msgProc : {}'.format(cmd[0])) #프로시저 진입 메시지 디버깅용
+
+        #딕셔너리 개체 생성후 명령어 목록과 함수 연결시켜서 호출한다.
 
         if cmd[0] == cmds[0]:
             await boat(message,cmd)
@@ -204,7 +244,11 @@ async def on_message(message):
             await callMem(message,cmd)
         elif cmd[0] == cmds[7] :
             await setBoat(message,cmd)
-            #await client.send_message(message.channel, "아직 구현 덜됨")
+        elif cmd[0] == cmds[8] :
+            await depart(message,cmd)
+        elif cmd[0] == help :
+            await helpMsg(message,cmd)
+            pass
     return
 
 client.run(Token)

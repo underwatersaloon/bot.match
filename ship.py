@@ -74,7 +74,9 @@ class ship:
             return tmp.crews
 
     def boarding(self, crewId):
-        if len(self.crews) == (self.maxc - 1) or self.crews.count(crewId) :
+        if self.state == 1 :
+            return False
+        elif len(self.crews) == (self.maxc - 1) or self.crews.count(crewId) :
             return False
         self.crews.append(crewId)
         return True
