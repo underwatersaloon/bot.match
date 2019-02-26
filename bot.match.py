@@ -6,7 +6,7 @@ client = discord.Client();
 #chan #활동 채널
 #admin #관리자
 #control character
-ctrlch='!중망호 '
+ctrlch='$'
 #command list
 help = '도움!' 
 cmds = ['모집' , '침몰' , '참가' , '탈주' , '목록', '정보', '호출', '설정' , '출항']
