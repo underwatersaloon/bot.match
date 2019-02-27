@@ -17,7 +17,7 @@ class ship:
         self.captain = member.id
         self.crews = []
         self.subject = member.name+'\'s boat'
-        #self.ftime = time.time()
+        #self.ftime = datetime.now()
         self.waiting = 60
         self.reqc = 3
         self.maxc = 5
@@ -82,7 +82,9 @@ class ship:
         return True
         
     def leaving(self, crewId):
-        if self.crews.count(crewId) or len(self.crews) != 0 :
+        if self.state == 1 :
+            return False
+        elif self.crews.count(crewId) or len(self.crews) != 0 :
             self.crews.remove(crewId)
             return True
         else :

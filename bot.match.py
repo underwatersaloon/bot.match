@@ -9,7 +9,7 @@ client = discord.Client();
 ctrlch='!중망호 '
 #command list
 help = '도움!' 
-cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정' , '출항']
+cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정' , '출항' , '선원' , '추방' ]
 guides = [ '만들기 [배 이름] : 새로운 배를 만든다. 배를 만든 사람은 선장이 된다. \n 배 이름을 입력하면 이름을 가진 배를 만들수 있다.' # 만들기 명령어에 대한 도움말
           ,'수장 : (선장 전용) 배를 버린다.' # 수장 명령어에 대한 도움말
           ,'타기 #(배 번호) : 배에 탄다. 이미 배를 가지고 있거나, 배에 탔다면 탈수 없다.' # 타기 명령어
@@ -18,13 +18,13 @@ guides = [ '만들기 [배 이름] : 새로운 배를 만든다. 배를 만든 �
           ,'정보 : 현재 타고 있는 배를 확인한다.' # 정보
           ,'호출 : (선장 전용) 선장은 선원을 호출할 수 있다. 바다로 나갈 시간이다!' # 호출
           ,'설정 (항목) : (변경 내용) , ... : (선장 전용) 선장은 자신의 배를 변경할 수 있다. \n 변경 가능 항목은 "배 이름" , "필요 인원" , "최대 인원", "출발 시간" 이다. '] # 설정
-#cmds.extend = ['출항', '선원 등록', '명령어', '관리자']
+#cmds.extend = ['예약', '선원 등록', '명령어', '관리자']
 #crew list
 cList = []
 wcList = []
 
 
-Token = ''
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1Nq5g.q6S0PINZLuz0h0vjDTTQAr-xCvo'
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -83,9 +83,11 @@ async def leave(message, cmd):
         if cIndex == -1 :
             cIndex = ship.findbyid(msgId)
             if cIndex > -1:
-                ship.callbyindex(cIndex).leaving(msgId)
-            cList.remove(msgId)
-            await client.send_message(message.channel, 'you just left a boat')
+                if ship.callbyindex(cIndex).leaving(msgId) :
+                    cList.remove(msgId)
+                    await client.send_message(message.channel, 'you just left a boat')
+                else :
+                    await client.send_message(message.channel, '배는 바다로 둘러 싸여있다')
         else :
             if ship.callbyindex(cIndex).captain == msgId:
                 await client.send_message(message.channel, 'you can\'t leave your boat')
@@ -211,6 +213,50 @@ async def helpMsg(message, cmd):
         embed.add_field(name = k, value = v , inline = False)
     await client.send_message(message.server.get_member(msgId),embed= embed)
 
+async def crewList(message, cmd):
+    """선장전용"""
+    msgId = message.author.id
+    cIndex = ship.findbycap(msgId)
+    embed = discord.Embed(title = '선원 목록', description = "당신의 선원입니다.")
+
+    if cIndex != -1 :
+        c = ship.callbyindex(msgId).crews
+        if len(c) > 0 :
+            for i in c :
+                tmp = message.server.get_member(msgId)
+                embed.add_field(name = tmp.nick,inline = True)
+            await client.send_message(msgId,embed = embed)
+        else :
+            await client.sendsend_message(message.channel,"선원이 없습니다.")
+    else : 
+        await client.send_message(message.channel,"당신은 선장이 아닙니다.")
+    pass
+
+async def kickCrew(message, cmd) :
+    msgId = message.author.id
+    cIndex = ship.findbycap(msgId)
+
+    if cIndex != -1 :
+        s = ship.callbyindex(cIndex)
+        tmp = cmd[1].split()
+        if tmp.isnumeric() :
+            n = int(tmp)
+            if n > 0 and n <= len(s.crews) :
+                cList.remove(s.crews[n-1])
+                kicked = s.crews.pop(n - 1)
+                await client.send_message(message.channel,"선원:{}을 당신의 배에서 추방했다.".format(message.server.get_member(kicked).nick))
+        else :
+            await client.send_message(message.channel, "잘못된 명령어")
+    else :
+        await client.send_message(message.channel,"당신은 선장이 아닙니다.")
+    pass
+
+async def reserve() :
+    pass
+
+async def debug() :
+    pass
+
 @client.event
 async def on_ready():
     print('logged in as')
@@ -246,6 +292,10 @@ async def on_message(message):
             await setBoat(message,cmd)
         elif cmd[0] == cmds[8] :
             await depart(message,cmd)
+        elif cmd[0] == cmds[9] :
+            await crewList(message,cmd)
+        elif cmd == cmds [10] :
+            await kickCrew(message,cmd)
         elif cmd[0] == help :
             await helpMsg(message,cmd)
             pass
