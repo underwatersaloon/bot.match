@@ -5,7 +5,7 @@ class ship:
     __slots__ = ['index', 'captain', 'crews', 'subject', 'ftime', 'waiting', 'reqc', 'maxc', 'state', 'dest']
     _gIndex = 0
     sList=[]
-    _slotKor = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '필요 인원', '최대 인원', '상태', '목적지']
+    _slotKor = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '최소', '최대', '상태', '목적지']
     _attTrans = dict(zip(_slotKor,__slots__))
     _attSet = dict(zip(__slots__,[None, None, None, 'str', None, 'num', 'num', 'num', None, 'str']))
 
