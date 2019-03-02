@@ -9,7 +9,8 @@ client = discord.Client();
 ctrlch='!중망호 '
 #command list
 help = '도움!' 
-cmds = ['만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정' , '출항' , '선원' , '추방' ]
+cmds = ['debug','만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정' , '출항' , '선원' , '추방']
+events = [] #콜백 리스트
 guides = [ '만들기 [배 이름] : 새로운 배를 만든다. 배를 만든 사람은 선장이 된다. \n 배 이름을 입력하면 이름을 가진 배를 만들수 있다.' # 만들기 명령어에 대한 도움말
           ,'수장 : (선장 전용) 배를 버린다.' # 수장 명령어에 대한 도움말
           ,'타기 #(배 번호) : 배에 탄다. 이미 배를 가지고 있거나, 배에 탔다면 탈수 없다.' # 타기 명령어
@@ -21,10 +22,10 @@ guides = [ '만들기 [배 이름] : 새로운 배를 만든다. 배를 만든 �
 #cmds.extend = ['예약', '선원 등록', '명령어', '관리자']
 #crew list
 cList = []
-wcList = []
+#wcList = [] 대기 선원 리스트
 
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1Nq5g.q6S0PINZLuz0h0vjDTTQAr-xCvo'
+Token = ''
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -32,6 +33,7 @@ def cmdParse(cmd, start = 1):
 
 def argParse(argu):
     """ : 로 구분? !중망호 세팅 이름:블라블라 블라숑, 블라블라 속성:하 시발 담배가 맵다, 아니시발 존나 싫엏 ㅠㅠ: 머라머라 머라
+    라고 쓸라고 했는데~ 했는데~ bash cmdline 방식으로 넘어갈래 
     딕셔너리 이용 함. k[attr]=val 방식인듯"""
     tmp = argu.split(",")
     argv = {}
@@ -41,9 +43,29 @@ def argParse(argu):
             argv[tmp2[0].strip()]=tmp2[1].strip()
     return argv
 
+def argParse2 (arg) :
+    ''' 리눅스 방식의 전달인자 파서 -Option1 -Option2 val [arg]'''
+    pass
+
+async def debuging(message, cmd) :
+    user = message.author
+    tmp = cmdParse(cmd[1].lstrip(),0)
+    args = []
+    if len(tmp) > 1:
+        args = argParse(tmp[1])
+    print('{} - {}#{} : {} (args:{}) '.format(user.nick,user.name,user.discriminator, tmp[0], len(args)))
+    for i in range(len(cmds)) :
+        if tmp[0] == cmds[i] :
+            print('entProc : {} - addr {}'.format(cmds[i],events[i]))
+            if len(args) > 0 :
+                for idx , val in enumerate(args) :
+                    print('arg{} : {}'.format(idx,val))
+            break
+    pass
+
 async def boat(message, cmd):
-    msgId=message.author.id
-    cIndex = -1
+    msgId = message.author.id
+    #cIndex = -1
     print('boat : ' + msgId) 
     if cList.count(msgId):
         await client.send_message(message.channel, 'he\'s already on his boat')
@@ -60,7 +82,7 @@ async def boat(message, cmd):
 
 async def boom(message, cmd):
     msgId=message.author.id
-    cIndex = -1
+    #cIndex = -1
     print('boom')
     cIndex = ship.findbycap(msgId)
     if cIndex < 0 :
@@ -76,7 +98,7 @@ async def boom(message, cmd):
 
 async def leave(message, cmd):
     msgId=message.author.id
-    cIndex = -1
+    #cIndex = -1
     print('leave')
     if cList.count(msgId):
         cIndex = ship.findbycap(msgId)
@@ -98,7 +120,7 @@ async def leave(message, cmd):
 
 async def board(message, cmd):
     msgId=message.author.id
-    cIndex = -1
+    #cIndex = -1
     print('board')
     if cList.count(msgId):
         await client.send_message(message.channel, 'he\'s already on crewlist')
@@ -122,7 +144,7 @@ async def board(message, cmd):
 
 async def recruit(message, cmd):
     msgId=message.author.id
-    cIndex = -1
+    #cIndex = -1
     print('recruit')
     if len(ship.sList) > 0 :
         embed=discord.Embed(title="제 1부두",description="뽀트는 중붕이를 태우고-")
@@ -135,7 +157,7 @@ async def recruit(message, cmd):
 
 async def boatInform(message, cmd):
     msgId=message.author.id
-    cIndex = -1
+    #cIndex = -1
     print("check Information : {} - {}".format(message.author.name, msgId))
     cIndex = ship.findbyid(msgId)
     if cIndex >= 0 :
@@ -150,7 +172,7 @@ async def boatInform(message, cmd):
 
 async def callMem(message, cmd):
     msgId = message.author.id
-    cIndex = -1
+    #cIndex = -1
     cIndex = ship.findbycap(msgId)
     if cIndex > -1 :
         boat = ship.callbyindex(cIndex)
@@ -170,7 +192,7 @@ async def callMem(message, cmd):
 
 async def setBoat(message, cmd):
     msgId = message.author.id
-    cIndex = -1
+    #cIndex = -1
     #has attr, get attr, set attr을 사용해서 적절하게 짠다.
     cIndex = ship.findbycap(msgId)
     if cIndex != -1 :
@@ -251,10 +273,15 @@ async def kickCrew(message, cmd) :
         await client.send_message(message.channel,"당신은 선장이 아닙니다.")
     pass
 
-async def reserve() :
+async def giveRole(message) :
+    if message.author.server_permissions.administrator is False :
+        return
+    if len( message.mentions) > 0 :
+        for i in message.mentions :
+            client.replace_roles(i,527870627021979684)
     pass
 
-async def debug() :
+async def reserve() :
     pass
 
 @client.event
@@ -262,6 +289,21 @@ async def on_ready():
     print('logged in as')
     print(client.user.name)
     print(client.user.id)
+    
+    events.append(debuging) #디버그용
+
+    events.append(boat) #만들기
+    events.append(boom) #수장
+    events.append(board) #타기
+    events.append(leave) #내리기
+    events.append(recruit) #모집중
+    events.append(boatInform) #정보
+    events.append(callMem) #호출
+    events.append(setBoat) #설정
+    events.append(depart) #출발
+    events.append(crewList) #선원 
+    events.append(kickCrew) #추방
+
     print('-----bot ready-----')
 
 @client.event
@@ -270,35 +312,18 @@ async def on_message(message):
         cmd = cmdParse(message.content, len(ctrlch)) #파싱 파-킹 이 아니라
         #msgId=message.author.id #길어 함수 내부로 이동
         #cIndex = -1 #index cursor 함수 내부로 이동
-        print('ent_msgProc : {}'.format(cmd[0])) #프로시저 진입 메시지 디버깅용
-
         #딕셔너리 개체 생성후 명령어 목록과 함수 연결시켜서 호출한다.
 
-        if cmd[0] == cmds[0]:
-            await boat(message,cmd)
-        elif cmd[0] == cmds[1] :
-            await boom(message,cmd)
-        elif cmd[0] == cmds[2] :
-            await board(message,cmd)
-        elif cmd[0] == cmds[3] :
-            await leave(message,cmd)
-        elif cmd[0] == cmds[4] :
-            await recruit(message,cmd)
-        elif cmd[0] == cmds[5] :
-            await boatInform(message,cmd)
-        elif cmd[0] == cmds[6] :
-            await callMem(message,cmd)
-        elif cmd[0] == cmds[7] :
-            await setBoat(message,cmd)
-        elif cmd[0] == cmds[8] :
-            await depart(message,cmd)
-        elif cmd[0] == cmds[9] :
-            await crewList(message,cmd)
-        elif cmd == cmds [10] :
-            await kickCrew(message,cmd)
-        elif cmd[0] == help :
-            await helpMsg(message,cmd)
-            pass
+        if cmd[0] == help :
+            helpMsg(message,cmd)
+        elif message.content.startswith('$의자 ') :
+            await giveRole(message)
+        else :
+            for i in range(len(cmds)) :
+                if cmds[i] == cmd[0] :
+                    print('ent_msgProc : {}'.format(cmd[0])) #프로시저 진입 메시지 디버깅용
+                    await events[i](message,cmd)
+                    break
     return
 
 client.run(Token)
