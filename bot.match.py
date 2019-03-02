@@ -25,7 +25,7 @@ cList = []
 #wcList = [] 대기 선원 리스트
 
 
-Token = ''
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1wzag.NVhvqaPfJP13R9bkHrxEaVLjzQ0'
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -318,14 +318,14 @@ async def on_message(message):
 
         if cmd[0] == help :
             helpMsg(message,cmd)
-        elif message.content.startswith('$의자 ') :
-            await giveRole(message)
         else :
             for i in range(len(cmds)) :
                 if cmds[i] == cmd[0] :
                     print('ent_msgProc : {}'.format(cmd[0])) #프로시저 진입 메시지 디버깅용
                     await events[i](message,cmd)
                     break
+    elif message.content.startswith('$교육') :
+        await giveRole(message)
     return
 
 client.run(Token)
