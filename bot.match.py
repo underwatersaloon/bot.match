@@ -274,11 +274,13 @@ async def kickCrew(message, cmd) :
     pass
 
 async def giveRole(message) :
-    if message.author.server_permissions.administrator is False :
+    if message.author.server_permissions.administrator is False or message.author.server_permissions.manage_roles is False :
+        await client.send_message(message.channel,'까비 권한 부족~')
         return
     if len( message.mentions) > 0 :
         for i in message.mentions :
-            client.replace_roles(i,527870627021979684)
+            client.replace_roles(i,'527870627021979684')
+        await client.send_message(message.channel,'보내드렸습니다.')
     pass
 
 async def reserve() :
