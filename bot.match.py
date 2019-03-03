@@ -25,7 +25,7 @@ cList = []
 #wcList = [] 대기 선원 리스트
 
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1w8CQ.LNiB1WSLAYUZhW9ZCzRrjMtxibk'
+Token = ''
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
