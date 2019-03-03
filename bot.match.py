@@ -168,7 +168,7 @@ async def boatInform(message, cmd):
     if cIndex >= 0 :
         msgS = message.server
         tmpS = ship.callbyindex(cIndex)
-        await client.send_message(message.channel, '#{}-{} : {} 선장(처녀, 임신가능) ({}/{}-{})'.format(cIndex, tmpS.subject, msgS. get_member(tmpS.captain).name,len(tmpS.crews) +1,tmpS.reqc, tmpS.maxc))
+        await client.send_message(message.channel, '#{}-{} : {} 선장 ({}/{}-{})'.format(cIndex, tmpS.subject, msgS. get_member(tmpS.captain).name,len(tmpS.crews) +1,tmpS.reqc, tmpS.maxc))
         pass
     else :
         await client.send_message(message.channel, "당신의 배는 없는 거샤아악")
@@ -256,7 +256,7 @@ async def crewList(message, cmd):
         if len(c) > 0 :
             for i in c :
                 tmp = message.server.get_member(i)
-                embed.add_field(name = tmp.name,value= "" ,inline = True)
+                embed.add_field(name = tmp.name,value= "(처녀, 임신가능)" ,inline = True)
             await client.send_message(message.author,embed = embed)
         else :
             await client.send_message(message.channel,"선원이 없습니다.")
