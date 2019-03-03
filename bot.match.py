@@ -1,6 +1,7 @@
 import discord
 import asyncio
 from ship import ship
+import sched,time
 
 client = discord.Client();
 #chan #활동 채널
@@ -9,7 +10,7 @@ client = discord.Client();
 ctrlch='!중망호 '
 #command list
 help = '도움!' 
-cmds = ['debug','만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정' , '출항' , '선원' , '추방']
+cmds = ['debug','만들기' , '수장' , '타기' , '내리기' , '모집중', '정보', '호출', '설정' , '출항' , '선원' , '추방', '예약']
 events = [] #콜백 리스트
 guides = [ '만들기 [배 이름] : 새로운 배를 만든다. 배를 만든 사람은 선장이 된다. \n 배 이름을 입력하면 이름을 가진 배를 만들수 있다.' # 만들기 명령어에 대한 도움말
           ,'수장 : (선장 전용) 배를 버린다.' # 수장 명령어에 대한 도움말
@@ -23,9 +24,11 @@ guides = [ '만들기 [배 이름] : 새로운 배를 만든다. 배를 만든 �
 #crew list
 cList = []
 #wcList = [] 대기 선원 리스트
+#스케쥴러
+s = sched.scheduler(time.time,time.sleep)
 
 
-Token = ''
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1w8CQ.LNiB1WSLAYUZhW9ZCzRrjMtxibk'
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -78,7 +81,6 @@ async def boat(message, cmd):
             await client.send_message(message.channel, 'your boat is ready')
         else :
             await client.send_message(message.channel, 'has a problem')
-                #print("succeed")
 
 async def boom(message, cmd):
     msgId=message.author.id
@@ -88,7 +90,10 @@ async def boom(message, cmd):
     if cIndex < 0 :
         await client.send_message(message.channel, 'there\'s no boat in this port')
     else :
-        if len(ship.callbyindex(cIndex).crews) != 0 :
+        tmp =ship.callbyindex(cIndex)
+        if tmp.state == 2 :
+            s.cancel(tmp.event_sche)
+        if len(tmp.crews) != 0 :
             for i in ship.boom(cIndex):
                 cList.remove(i)
         else :
@@ -150,7 +155,7 @@ async def recruit(message, cmd):
         embed=discord.Embed(title="제 1부두",description="뽀트는 중붕이를 태우고-")
         for i in ship.sList :
             bInfo=i.infor()
-            if i.state == 0 :
+            if i.state != 1 :
                embed.add_field(name = bInfo[0], value = bInfo[1], inline=True)
         await client.send_message(message.channel,embed=embed)
     pass
@@ -211,13 +216,18 @@ async def setBoat(message, cmd):
     pass
 
 async def depart(message, cmd) :
-    msgId=message.author.id
-    cIndex = ship.findbycap(msgId)
+    if message is not None :
+        msgId=message.author.id
+        cIndex = ship.findbycap(msgId)
+    else :
+        pass #반드시 채워 넣어야함니다 ㅠㅠ
     if cIndex != -1 :
         tmpS = ship.callbyindex(cIndex)
         if tmpS.state == 1 :
             await client.send_message(message.channel,"이미 바다에 나가버린 배입니다.")
         elif (len(tmpS.crews) + 1) >= tmpS.reqc :
+            if tmpS.state == 2 :
+                s.cancel(tmpS.event_sche)
             tmpS.state = 1 #수정 필요
             await client.send_message(message.channel,"요오시 출항이다!")
         else :
@@ -239,17 +249,17 @@ async def crewList(message, cmd):
     """선장전용"""
     msgId = message.author.id
     cIndex = ship.findbycap(msgId)
-    embed = discord.Embed(title = '선원 목록', description = "당신의 선원입니다.")
+    embed = discord.Embed(title = '선원 목록', description = "당신의 선원(노예)입니다.")
 
     if cIndex != -1 :
-        c = ship.callbyindex(msgId).crews
+        c = ship.callbyindex(cIndex).crews
         if len(c) > 0 :
             for i in c :
-                tmp = message.server.get_member(msgId)
-                embed.add_field(name = tmp.nick,inline = True)
-            await client.send_message(msgId,embed = embed)
+                tmp = message.server.get_member(i)
+                embed.add_field(name = tmp.name,value= "" ,inline = True)
+            await client.send_message(message.author,embed = embed)
         else :
-            await client.sendsend_message(message.channel,"선원이 없습니다.")
+            await client.send_message(message.channel,"선원이 없습니다.")
     else : 
         await client.send_message(message.channel,"당신은 선장이 아닙니다.")
     pass
@@ -260,15 +270,19 @@ async def kickCrew(message, cmd) :
 
     if cIndex != -1 :
         s = ship.callbyindex(cIndex)
-        tmp = cmd[1].split()
-        if tmp.isnumeric() :
-            n = int(tmp)
-            if n > 0 and n <= len(s.crews) :
-                cList.remove(s.crews[n-1])
-                kicked = s.crews.pop(n - 1)
-                await client.send_message(message.channel,"선원:{}을 당신의 배에서 추방했다.".format(message.server.get_member(kicked).nick))
+        if len(message.mentions) > 0 :
+            for k in message.mentions :
+                if s.captain == k.id :
+                    await client.send_message(message.channel,'당신은 배의 선장입니다.')
+                elif s.crews.count(k.id) > 0 :
+                    s.crews.remove(k.id)
+                    cList.remove(k.id)
+                    await client.send_message(message.channel,"선원:{}을 당신의 배에서 추방했다.".format(k.name))
+                    await client.send_message(k,"당신은 {}의 배에서 추방당했습니다.".format(s.subject))
+                else :
+                    await client.send_message(message.channel,"{}는 당신의 배에 없습니다.".format(k.name))
         else :
-            await client.send_message(message.channel, "잘못된 명령어")
+            await client.send_message(message.channel, "누구도 쫓아내지 못했다.")
     else :
         await client.send_message(message.channel,"당신은 선장이 아닙니다.")
     pass
@@ -283,17 +297,27 @@ def chRole(message) :
 async def giveRole(message) :
     if message.author.server_permissions.administrator is False and message.author.server_permissions.manage_roles is False :
         await client.send_message(message.channel,'까비 권한 부족~')
-        return
-    tmp = 0
-    if len(message.role_mentions) > 0 :
-        tmp = message.role_mentions[0]
-    if len( message.mentions) > 0 :
-        for i in message.mentions :
-            await client.replace_roles(i,tmp)
-        await client.send_message(message.channel,'보내드렸습니다.')
+    else :
+        tmp = 0
+        if len(message.role_mentions) > 0 :
+            tmp = message.role_mentions[0]
+        else : 
+            return
+        if len( message.mentions) > 0 :
+            for i in message.mentions :
+                await client.replace_roles(i,tmp)
+            await client.send_message(message.channel,'보내드렸습니다.')
     pass
 
-async def reserve() :
+async def reserve(message,cmd) :
+    msgId = message.author.id
+    cIndex = ship.findbycap(msgId)
+
+    if cIndex == -1 :
+        await client.send_message(message.channel,'당신은 노선장')
+    else :
+        #스케쥴러에 예약하고 스케쥴러 이벤트를 받는다. 받아서 선박에 저장한다.
+        pass
     pass
 
 @client.event
@@ -327,7 +351,7 @@ async def on_message(message):
         #딕셔너리 개체 생성후 명령어 목록과 함수 연결시켜서 호출한다.
 
         if cmd[0] == help :
-            helpMsg(message,cmd)
+            await helpMsg(message,cmd)
         else :
             for i in range(len(cmds)) :
                 if cmds[i] == cmd[0] :

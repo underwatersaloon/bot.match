@@ -1,13 +1,14 @@
 import discord
+import datetime
 
 class ship:
 
-    __slots__ = ['index', 'captain', 'crews', 'subject', 'ftime', 'waiting', 'reqc', 'maxc', 'state', 'dest']
+    __slots__ = ['index', 'captain', 'crews', 'subject', 'ftime', 'waiting', 'reqc', 'maxc', 'state', 'dest','event_sche']
     _gIndex = 0
     sList=[]
-    _slotKor = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '최소', '최대', '상태', '목적지']
+    _slotKor = ['index', '선장', '선원', '이름', '건조 시간', '대기 시간', '최소', '최대', '상태', '목적지','스케쥴러 이벤트']
     _attTrans = dict(zip(_slotKor,__slots__))
-    _attSet = dict(zip(__slots__,[None, None, None, 'str', None, 'num', 'num', 'num', None, 'str']))
+    _attSet = dict(zip(__slots__,[None, None, None, 'str', None, 'num', 'num', 'num', None, 'str',None]))
 
     def __init__(self, member):
         if ship.sList.count(member.id):
@@ -17,11 +18,12 @@ class ship:
         self.captain = member.id
         self.crews = []
         self.subject = member.name+'\'s boat'
-        #self.ftime = datetime.now()
+        self.ftime = datetime.datetime.now()
         self.waiting = 60
         self.reqc = 3
         self.maxc = 5
         self.state = 0
+        self.event_sche = None
         ship.sList.append(self)
         return
 
