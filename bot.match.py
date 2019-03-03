@@ -334,10 +334,11 @@ async def on_message(message):
                     print('ent_msgProc : {}'.format(cmd[0])) #프로시저 진입 메시지 디버깅용
                     await events[i](message,cmd)
                     break
-    #elif message.content.startswith('$교육') :
-    #    await giveRole(message)
+    elif message.content.startswith('$교육') :
+        await giveRole(message)
     elif message.content.startswith('$역할') :
-        chRole(message)
+        #chRole(message)
+        pass
     return
 
 client.run(Token)
