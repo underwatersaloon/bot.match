@@ -281,10 +281,9 @@ def chRole(message) :
     pass
 
 async def giveRole(message) :
-    if message.author.server_permissions.administrator is False or message.author.server_permissions.manage_roles is False :
+    if message.author.server_permissions.administrator is False and message.author.server_permissions.manage_roles is False :
         await client.send_message(message.channel,'까비 권한 부족~')
         return
-    return
     tmp = 0
     if len(message.role_mentions) > 0 :
         tmp = message.role_mentions[0]
