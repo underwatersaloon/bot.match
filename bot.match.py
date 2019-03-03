@@ -25,7 +25,7 @@ cList = []
 #wcList = [] 대기 선원 리스트
 
 
-Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1wzag.NVhvqaPfJP13R9bkHrxEaVLjzQ0'
+Token = 'NTQ3ODkyODU5MDc2ODcwMTUw.D1w8CQ.LNiB1WSLAYUZhW9ZCzRrjMtxibk'
 
 def cmdParse(cmd, start = 1):
     """cmd Parser 써보지 않아서 모름"""
@@ -273,13 +273,24 @@ async def kickCrew(message, cmd) :
         await client.send_message(message.channel,"당신은 선장이 아닙니다.")
     pass
 
+def chRole(message) :
+    if len( message.mentions) > 0 :
+        for i in message.mentions :
+            for j in i.roles :
+                print (j)
+    pass
+
 async def giveRole(message) :
     if message.author.server_permissions.administrator is False or message.author.server_permissions.manage_roles is False :
         await client.send_message(message.channel,'까비 권한 부족~')
         return
+    return
+    tmp = 0
+    if len(message.role_mentions) > 0 :
+        tmp = message.role_mentions[0]
     if len( message.mentions) > 0 :
         for i in message.mentions :
-            client.replace_roles(i,'527870627021979684')
+            await client.replace_roles(i,tmp)
         await client.send_message(message.channel,'보내드렸습니다.')
     pass
 
@@ -324,8 +335,10 @@ async def on_message(message):
                     print('ent_msgProc : {}'.format(cmd[0])) #프로시저 진입 메시지 디버깅용
                     await events[i](message,cmd)
                     break
-    elif message.content.startswith('$교육') :
-        await giveRole(message)
+    #elif message.content.startswith('$교육') :
+    #    await giveRole(message)
+    elif message.content.startswith('$역할') :
+        chRole(message)
     return
 
 client.run(Token)
